@@ -38,6 +38,7 @@ class Object:
     TYPE_SAND = 0
     TYPE_FIRE = 1
     TYPE_WATER = 2
+    GLOBAL_RECT = pygame.Rect(0 * BOX_SIZE[0], 0 * BOX_SIZE[1], *BOX_SIZE)
     def __init__(self, type, color) -> None:
         self.color = color # (randint(1,255), randint(1,255), randint(1,255))
         self.type = type
@@ -45,7 +46,9 @@ class Object:
         self.dont_bother = False
 
     def Draw(self,grid_x,grid_y):
-        pygame.draw.rect(screen, self.color, pygame.Rect(grid_x * BOX_SIZE[0], grid_y * BOX_SIZE[1], *BOX_SIZE), width=0)
+        Object.GLOBAL_RECT.x = grid_x * BOX_SIZE[0]
+        Object.GLOBAL_RECT.y = grid_y * BOX_SIZE[1]
+        pygame.draw.rect(screen, self.color, Object.GLOBAL_RECT, width=0)
 
     def IsAvailable(self, x, y, types=[]):
         if (x >= 0 and x < GRID_SIZE[0] and y >= 0 and y < GRID_SIZE[1]):
@@ -154,11 +157,6 @@ class Water(Object):
       
 
 def Draw():
-    if 0:
-        for _x in range(1,GRID_SIZE[0]):
-            pygame.draw.line(screen, Color.WHITE, (_x * BOX_SIZE[1],0), (_x * BOX_SIZE[1],WINDOW_SIZE[1]), width=1)
-        for _y in range(1,GRID_SIZE[1]):
-            pygame.draw.line(screen, Color.WHITE, (0, _y * BOX_SIZE[0]), (WINDOW_SIZE[0], _y * BOX_SIZE[0]), width=1)
     for x in range(len(objects)):
         for y in range(len(objects[0])):
             if objects[x][y] != None:

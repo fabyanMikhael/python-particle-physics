@@ -52,6 +52,36 @@ class Object:
             if (objects[x][y] == None or objects[x][y].type not in types): return True
         return False
 
+    def NotifyOthers(self,x,y, tmp=None):
+        tmp = [self.type] if tmp is None else tmp
+
+        if y + 1 < GRID_SIZE[1]:
+            if not self.IsAvailable(x,y+1, tmp):
+                objects[x][y+1].dont_bother = False
+            if x > 0:
+                if not self.IsAvailable(x-1,y+1, tmp):
+                    objects[x-1][y+1].dont_bother = False
+            if x + 1 < GRID_SIZE[0]:
+                if not self.IsAvailable(x+1,y+1, tmp):
+                    objects[x+1][y+1].dont_bother = False
+
+        if x > 0:
+            if not self.IsAvailable(x-1,y, tmp):
+                objects[x-1][y].dont_bother = False
+        if x +1 < GRID_SIZE[0]:
+            if not self.IsAvailable(x+1,y, tmp):
+                objects[x+1][y].dont_bother = False
+
+        if y > 1:
+            if not self.IsAvailable(x,y-1, tmp):
+                objects[x][y-1].dont_bother = False
+            if x > 0:
+                if not self.IsAvailable(x-1,y-1, tmp):
+                    objects[x-1][y-1].dont_bother = False
+            if x + 1< GRID_SIZE[0]:
+                if not self.IsAvailable(x+1,y-1, tmp):
+                    objects[x+1][y-1].dont_bother = False
+
 class Sand(Object):
     def __init__(self) -> None:
         super().__init__(Object.TYPE_SAND, (76,70,50))
@@ -61,13 +91,18 @@ class Sand(Object):
         if self.IsAvailable(x,y+1, self.collides_with):
             objects[x][y] = None
             objects[x][y+1] = self
+            self.NotifyOthers(x,y, [Object.TYPE_WATER])
         elif self.IsAvailable(x-1,y+1, self.collides_with):
             objects[x][y] = None
             objects[x-1][y+1] = self
+            self.NotifyOthers(x,y, [Object.TYPE_WATER])
         elif self.IsAvailable(x+1,y+1, self.collides_with):
             objects[x][y] = None
             objects[x+1][y+1] = self
+            self.NotifyOthers(x,y, [Object.TYPE_WATER])
         else : self.dont_bother = True
+
+    
 
 class Fire(Object):
     def __init__(self) -> None:
@@ -91,6 +126,7 @@ class Water(Object):
     def __init__(self) -> None:
         super().__init__(Object.TYPE_WATER, Color.BLUE)
         self.collides_with.append(Object.TYPE_SAND)
+
     def Update(self, x, y):
         if y == GRID_SIZE[1] - 1: return
         if self.IsAvailable(x,y+1, self.collides_with):
@@ -99,16 +135,23 @@ class Water(Object):
         elif self.IsAvailable(x-1,y+1, self.collides_with):
             objects[x][y] = None
             objects[x-1][y+1] = self
+            self.NotifyOthers(x,y)
         elif self.IsAvailable(x+1,y+1, self.collides_with):
             objects[x][y] = None
             objects[x+1][y+1] = self
+            self.NotifyOthers(x,y)
         elif self.IsAvailable(x+1,y, self.collides_with):
             objects[x][y] = None
             objects[x+1][y] = self
+            self.NotifyOthers(x,y)
         elif self.IsAvailable(x-1,y, self.collides_with):
             objects[x][y] = None
             objects[x-1][y] = self
+            self.NotifyOthers(x,y)
+        else : self.dont_bother = True
 
+
+      
 
 def Draw():
     if 0:
